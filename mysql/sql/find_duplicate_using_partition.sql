@@ -1,0 +1,1 @@
+select * from (select *,row_number() over(partition by user_name order by user_id) as RN from users) x where x.RN>1;
