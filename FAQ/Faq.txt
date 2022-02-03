@@ -171,3 +171,233 @@ Object virtually always comes up with a unique number for each object,
 even if the equals() method is overridden in such a way that two or more objects are considered equal. 
 It doesn't matter how equal the objects are if their hashcodes don't reflect that. 
 So one more time: If two objects are equal, their hashcodes must be equal as well.
+
+
+You must override hashCode() in every class that overrides equals(). Failure to do so will result 
+in a violation of the general contract for Object.hashCode(), which will prevent your class from 
+functioning properly in conjunction with all hash-based collections, including HashMap, HashSet, 
+and Hashtable.
+
+
+   from Effective Java, by Joshua Bloch
+   
+
+
+Identity is not equality.
+===========================
+
+In order to identity differences between two objects we need to override equals method.
+
+Identity is not equality.
+
+equals operator == test identity.
+equals(Object obj) method compares equality test(i.e. we need to tell equality by overriding the method)
+Why do I need to override the equals and hashCode methods in Java?
+
+First we have to understand the use of equals method.
+
+In order to identity differences between two objects we need to override equals method.
+
+For example:
+
+Customer customer1=new Customer("peter");
+Customer customer2=customer1;
+customer1.equals(customer2); // returns true by JVM. i.e. both are refering same Object
+------------------------------
+Customer customer1=new Customer("peter");
+Customer customer2=new Customer("peter");
+customer1.equals(customer2); //return false by JVM i.e. we have two different peter customers.
+
+------------------------------
+Now I have overriden Customer class equals method as follows:
+ @Override
+    public boolean equals(Object obj) {
+        if (this == obj)   // it checks references
+            return true;
+        if (obj == null) // checks null
+            return false;
+        if (getClass() != obj.getClass()) // both object are instances of same class or not
+            return false;
+        Customer other = (Customer) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name)) // it again using bulit in String object equals to identify the difference 
+            return false;
+        return true; 
+    }
+Customer customer1=new Customer("peter");
+Customer customer2=new Customer("peter");
+Insteady identify the Object equality by JVM, we can do it by overring equals method.
+customer1.equals(customer2);  // returns true by our own logic
+
+
+Now hashCode method can understand easily.
+==========================================
+
+hashCode produces integer in order to store object in data structures like HashMap, HashSet.
+
+Assume we have override equals method of Customer as above,
+
+customer1.equals(customer2);  // returns true by our own logic
+While working with data structure when we store object in buckets(bucket is a fancy name for folder). 
+If we use built-in hash technique, for above two customers it generates two different hashcode. 
+So we are storing the same identical object in two different places. 
+To avoid this kind of issues we should override the hashCode method also based on the following principles.
+
+un-equal instances may have same hashcode.
+equal instances should return same hashcode.
+
+
+Q2) Why we override equals() method ?
+
+Ans:
+In Java we can not overload how operators like ==, +=, -+ behave. They are behaving a certain way. 
+
+Java doesn't supports operator overloading because it's just a choice made by its creators 
+who wanted to keep the language more simple. ... Operator overloading allows you to do something extra 
+than what for it is expected for. Java only allows arithmetic operations on elementary numeric types
+
+So let's focus on the operator == for our case here.
+
+How operator == works.
+
+It checks if 2 references that we compare point to the same instance in memory. 
+Operator == will resolve to true only if those 2 references represent the same instance in memory.
+
+So now let's consider the following example
+
+public class Person {
+
+      private Integer age;
+      private String name;
+    
+      ..getters, setters, constructors
+      }
+So let's say that in your program you have built 2 Person objects on different places and 
+you wish to compare them.
+
+Person person1 = new Person("Mike", 34);
+Person person2 = new Person("Mike", 34);
+System.out.println ( person1 == person2 );  --> will print false!
+
+Those 2 objects from business perspective look the same right? For JVM they are not the same. 
+Since they are both created with new keyword those instances are located in different segments in memory. 
+Therefore the operator == will return false
+
+But if we can not override the == operator how can we say to JVM that we want those 2 objects 
+to be treated as same. There comes the .equals() method in play.
+
+You can override equals() to check if some objects have same values for specific fields to be 
+considered equal.
+
+You can select which fields you want to be compared. If we say that 2 Person objects will be the same 
+if and only if they have the same age and same name, then the IDE will create something like the 
+following for automatic generation of equals()
+
+@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return age == person.age &&
+                name.equals(person.name);
+    }
+
+Let's go back to our previous example
+
+    Person person1 = new Person("Mike", 34);
+    Person person2 = new Person("Mike", 34);
+    System.out.println ( person1 == person2 );   --> will print false!
+    System.out.println ( person1.equals(person2) );  --> will print true!
+	
+So we can not overload == operator to compare objects the way we want but Java gave us another way, 
+the equals() method, which we can override as we want.
+
+Keep in mind however, if we don't provide our custom version of .equals() (aka override) 
+in our class then the predefined .equals() from Object class and == operator will behave exactly the same.
+
+Default equals() method which is inherited from Object will check whether both compared instances 
+are the same in memory!
+
+Why we override equals() method
+
+In Java we can not overload how operators like ==, +=, -+ behave. They are behaving a certain way. So let's focus on the operator == for our case here.
+
+How operator == works.
+
+It checks if 2 references that we compare point to the same instance in memory. Operator == will resolve to true only if those 2 references represent the same instance in memory.
+
+So now let's consider the following example
+
+public class Person {
+
+      private Integer age;
+      private String name;
+    
+      ..getters, setters, constructors
+      }
+So let's say that in your program you have built 2 Person objects on different places and you wish to compare them.
+
+Person person1 = new Person("Mike", 34);
+Person person2 = new Person("Mike", 34);
+System.out.println ( person1 == person2 );  --> will print false!
+Those 2 objects from business perspective look the same right? For JVM they are not the same. Since they are both created with new keyword those instances are located in different segments in memory. Therefore the operator == will return false
+
+But if we can not override the == operator how can we say to JVM that we want those 2 objects to be treated as same. There comes the .equals() method in play.
+
+You can override equals() to check if some objects have same values for specific fields to be considered equal.
+
+You can select which fields you want to be compared. If we say that 2 Person objects will be the same if and only if they have the same age and same name, then the IDE will create something like the following for automatic generation of equals()
+
+@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return age == person.age &&
+                name.equals(person.name);
+    }
+Let's go back to our previous example
+
+    Person person1 = new Person("Mike", 34);
+    Person person2 = new Person("Mike", 34);
+    System.out.println ( person1 == person2 );   --> will print false!
+    System.out.println ( person1.equals(person2) );  --> will print true!
+	
+So we can not overload == operator to compare objects the way we want but Java gave us another way, 
+the equals() method, which we can override as we want.
+
+Keep in mind however, if we don't provide our custom version of .equals() (aka override) in our class 
+then the predefined .equals() from Object class and == operator will behave exactly the same.
+
+Default equals() method which is inherited from Object will check whether both compared instances 
+are the same in memory!
+
+
+
+Q3) Why we override hashCode() method
+
+Some Data Structures in java like HashSet, HashMap store their elements based on a hash function which 
+is applied on those elements. The hashing function is the hashCode()
+
+If we have a choice of overriding .equals() method then we must also have a choice of overriding 
+hashCode() method. There is a reason for that.
+
+Default implementation of hashCode() which is inherited from Object considers all objects 
+in memory unique!
+
+Let's get back to those hash data structures. There is a rule for those data structures.
+
+HashSet can not contain duplicate values and HashMap can not contain duplicate keys
+
+HashSet is implemented with a HashMap behind the scenes where each value of a HashSet 
+is stored as a key in a HashMap.
+
+So we have to understand how a HashMap works.
+
+In a simple way a HashMap is a native array that has some buckets. Each bucket has a linkedList. 
+In that linkedList our keys are stored. HashMap locates the correct linkedList for each key by applying 
+hashCode() method and after that it iterates through all elements of that linkedList and 
+applies equals() method on each of these elements to check if that element is already contained there. 
+No duplicate keys are allowed.
