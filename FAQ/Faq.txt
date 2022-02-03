@@ -376,7 +376,8 @@ are the same in memory!
 
 
 
-Q3) Why we override hashCode() method
+Q3) Why we override hashCode() method?
+===============================================
 
 Some Data Structures in java like HashSet, HashMap store their elements based on a hash function which 
 is applied on those elements. The hashing function is the hashCode()
@@ -401,3 +402,5 @@ In that linkedList our keys are stored. HashMap locates the correct linkedList f
 hashCode() method and after that it iterates through all elements of that linkedList and 
 applies equals() method on each of these elements to check if that element is already contained there. 
 No duplicate keys are allowed.
+
+
