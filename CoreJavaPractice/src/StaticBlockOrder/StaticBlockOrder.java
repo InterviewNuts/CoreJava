@@ -2,7 +2,7 @@ package StaticBlockOrder;
 
 
 /*
-static variable  is declared outside any method and it goes method area & loaded when the class is loaded
+static variable  is declared outside any method and it goes method area of JVM memory space & loaded when the class is loaded
  */
 public class StaticBlockOrder {
 	static StaticBlockOrder objMember = new StaticBlockOrder(20);
